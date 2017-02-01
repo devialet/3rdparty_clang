@@ -944,12 +944,6 @@ void UnwrappedLineFormatter::formatFirstToken(FormatToken &RootToken,
       (!PreviousLine->InPPDirective || !RootToken.HasUnescapedNewline))
     Newlines = std::min(1u, Newlines);
 
-  // Add a new line after '};' if not already done
-  if (Newlines == 1 && PreviousLine && PreviousLine->Last &&
-      PreviousLine->Last->Previous && PreviousLine->Last->is(tok::semi) &&
-      PreviousLine->Last->Previous->is(tok::r_brace))
-    Newlines++;
-
   Whitespaces->replaceWhitespace(RootToken, Newlines, IndentLevel, Indent,
                                  Indent, InPPDirective &&
                                              !RootToken.HasUnescapedNewline);

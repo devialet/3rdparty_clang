@@ -1542,21 +1542,17 @@ void UnwrappedLineParser::parseTryCatch() {
 void UnwrappedLineParser::parseNamespace() {
   assert(FormatTok->Tok.is(tok::kw_namespace) && "'namespace' expected");
 
-  bool IsAnonymousNamespace = true;
   const FormatToken &InitialToken = *FormatTok;
   nextToken();
-  while (FormatTok->isOneOf(tok::identifier, tok::coloncolon)) {
-    IsAnonymousNamespace = false;
+  while (FormatTok->isOneOf(tok::identifier, tok::coloncolon))
     nextToken();
-  }
   if (FormatTok->Tok.is(tok::l_brace)) {
-    if (IsAnonymousNamespace && ShouldBreakBeforeBrace(Style, InitialToken))
+    if (ShouldBreakBeforeBrace(Style, InitialToken))
       addUnwrappedLine();
 
     bool AddLevel = Style.NamespaceIndentation == FormatStyle::NI_All ||
                     (Style.NamespaceIndentation == FormatStyle::NI_Inner &&
-                     DeclarationScopeStack.size() > 1) ||
-                    IsAnonymousNamespace;
+                     DeclarationScopeStack.size() > 1);
     parseBlock(/*MustBeDeclaration=*/true, AddLevel);
     // Munch the semicolon after a namespace. This is more common than one would
     // think. Puttin the semicolon into its own line is very ugly.

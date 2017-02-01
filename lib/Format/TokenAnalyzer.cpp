@@ -100,7 +100,9 @@ tooling::Replacements TokenAnalyzer::process() {
     DEBUG(llvm::dbgs() << "Run " << Run << "...\n");
     SmallVector<AnnotatedLine *, 16> AnnotatedLines;
 
-    TokenAnnotator Annotator(Style, Tokens.getKeywords());
+    TokenAnnotator Annotator(Env.getSourceManager(),
+                             Style,
+                             Tokens.getKeywords());
     for (unsigned i = 0, e = UnwrappedLines[Run].size(); i != e; ++i) {
       AnnotatedLines.push_back(new AnnotatedLine(UnwrappedLines[Run][i]));
       Annotator.annotate(*AnnotatedLines.back());

@@ -17,10 +17,10 @@
 #define LLVM_CLANG_LIB_FORMAT_TOKENANNOTATOR_H
 
 #include "UnwrappedLineParser.h"
+#include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 
 namespace clang {
-class SourceManager;
 
 namespace format {
 
@@ -135,8 +135,10 @@ private:
 /// \c UnwrappedLine.
 class TokenAnnotator {
 public:
-  TokenAnnotator(const FormatStyle &Style, const AdditionalKeywords &Keywords)
-      : Style(Style), Keywords(Keywords) {}
+  TokenAnnotator(const SourceManager &Manager,
+                 const FormatStyle &Style,
+                 const AdditionalKeywords &Keywords)
+      : SrcManager(Manager), Style(Style), Keywords(Keywords) {}
 
   /// \brief Adapts the indent levels of comment lines to the indent of the
   /// subsequent line.
@@ -165,6 +167,10 @@ private:
   void printDebugInfo(const AnnotatedLine &Line);
 
   void calculateUnbreakableTailLengths(AnnotatedLine &Line);
+
+  bool isInLambda(const AnnotatedLine& Line, const FormatToken& Token);
+
+  const SourceManager &SrcManager;
 
   const FormatStyle &Style;
 

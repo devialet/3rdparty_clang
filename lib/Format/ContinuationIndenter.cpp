@@ -838,10 +838,6 @@ unsigned ContinuationIndenter::moveStateToNextToken(LineState &State,
            !Current.isStringLiteral())
     State.StartOfStringLiteral = 0;
 
-  // Hack, retrieve ': ' to stay aligned on ':'
-  if (Current.is(TT_CtorInitializerColon))
-    State.Column -= 2;
-
   State.Column += Current.ColumnWidth;
   State.NextToken = State.NextToken->Next;
   unsigned Penalty = breakProtrudingToken(Current, State, DryRun);

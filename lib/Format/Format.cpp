@@ -118,7 +118,6 @@ template <> struct ScalarEnumerationTraits<FormatStyle::BraceBreakingStyle> {
     IO.enumCase(Value, "Allman", FormatStyle::BS_Allman);
     IO.enumCase(Value, "GNU", FormatStyle::BS_GNU);
     IO.enumCase(Value, "WebKit", FormatStyle::BS_WebKit);
-    IO.enumCase(Value, "Devialet", FormatStyle::BS_Devialet);
     IO.enumCase(Value, "Custom", FormatStyle::BS_Custom);
   }
 };
@@ -366,7 +365,6 @@ template <> struct MappingTraits<FormatStyle::BraceWrappingFlags> {
     IO.mapOptional("AfterControlStatement", Wrapping.AfterControlStatement);
     IO.mapOptional("AfterEnum", Wrapping.AfterEnum);
     IO.mapOptional("AfterFunction", Wrapping.AfterFunction);
-    IO.mapOptional("AfterLambda", Wrapping.AfterLambda);
     IO.mapOptional("AfterNamespace", Wrapping.AfterNamespace);
     IO.mapOptional("AfterObjCDeclaration", Wrapping.AfterObjCDeclaration);
     IO.mapOptional("AfterStruct", Wrapping.AfterStruct);
@@ -449,7 +447,7 @@ static FormatStyle expandPresets(const FormatStyle &Style) {
     return Style;
   FormatStyle Expanded = Style;
   Expanded.BraceWrapping = {false, false, false, false, false, false,
-                            false, false, false, false, false, false};
+                            false, false, false, false, false};
   switch (Style.BreakBeforeBraces) {
   case FormatStyle::BS_Linux:
     Expanded.BraceWrapping.AfterClass = true;
@@ -481,24 +479,10 @@ static FormatStyle expandPresets(const FormatStyle &Style) {
     break;
   case FormatStyle::BS_GNU:
     Expanded.BraceWrapping = {true, true, true, true, true, true,
-                              true, true, true, true, true, true};
+                              true, true, true, true, true};
     break;
   case FormatStyle::BS_WebKit:
     Expanded.BraceWrapping.AfterFunction = true;
-    break;
-  case FormatStyle::BS_Devialet:
-    Expanded.BraceWrapping.AfterClass = true;
-    Expanded.BraceWrapping.AfterControlStatement = true;
-    Expanded.BraceWrapping.AfterEnum = true;
-    Expanded.BraceWrapping.AfterFunction = true;
-    Expanded.BraceWrapping.AfterLambda = true;
-    Expanded.BraceWrapping.AfterNamespace = true;
-    Expanded.BraceWrapping.AfterObjCDeclaration = true;
-    Expanded.BraceWrapping.AfterStruct = true;
-    Expanded.BraceWrapping.AfterUnion = true;
-    Expanded.BraceWrapping.BeforeCatch = true;
-    Expanded.BraceWrapping.BeforeElse = true;
-    Expanded.BraceWrapping.IndentBraces = false;
     break;
   default:
     break;
@@ -532,7 +516,7 @@ FormatStyle getLLVMStyle() {
   LLVMStyle.BreakBeforeTernaryOperators = true;
   LLVMStyle.BreakBeforeBraces = FormatStyle::BS_Attach;
   LLVMStyle.BraceWrapping = {false, false, false, false, false, false,
-                             false, false, false, false, false, false};
+                             false, false, false, false, false};
   LLVMStyle.BreakAfterJavaFieldAnnotations = false;
   LLVMStyle.BreakConstructorInitializersBeforeComma = false;
   LLVMStyle.BreakStringLiterals = true;
@@ -739,93 +723,6 @@ FormatStyle getNoStyle() {
   return NoStyle;
 }
 
-FormatStyle getDevialetStyle() {
-  FormatStyle DevialetStyle = getLLVMStyle();
-
-  DevialetStyle.Language = FormatStyle::LK_None;
-  DevialetStyle.AccessModifierOffset = -4;
-  DevialetStyle.AlignAfterOpenBracket = FormatStyle::BAS_Align;
-  DevialetStyle.AllowAllParametersOfDeclarationOnNextLine = false;
-  DevialetStyle.AlignConsecutiveAssignments = false;
-  DevialetStyle.AlignConsecutiveDeclarations = false;
-  DevialetStyle.AlignEscapedNewlinesLeft = true;
-  DevialetStyle.AlignOperands = true;
-  DevialetStyle.AlignTrailingComments = true;
-  DevialetStyle.AllowShortBlocksOnASingleLine = false;
-  DevialetStyle.AllowShortCaseLabelsOnASingleLine = false;
-  DevialetStyle.AllowShortFunctionsOnASingleLine = FormatStyle::SFS_Empty;
-  DevialetStyle.AllowShortIfStatementsOnASingleLine = false;
-  DevialetStyle.AllowShortLoopsOnASingleLine = false;
-  DevialetStyle.AlwaysBreakAfterDefinitionReturnType = FormatStyle::DRTBS_None;
-  DevialetStyle.AlwaysBreakAfterReturnType = FormatStyle::RTBS_None;
-  DevialetStyle.AlwaysBreakBeforeMultilineStrings = false;
-  DevialetStyle.AlwaysBreakTemplateDeclarations = true;
-  DevialetStyle.BinPackArguments = false;
-  DevialetStyle.BinPackParameters = false;
-  DevialetStyle.BreakBeforeBinaryOperators = FormatStyle::BOS_None;
-  DevialetStyle.BreakBeforeBraces = FormatStyle::BS_Devialet;
-  DevialetStyle.BreakBeforeTernaryOperators = true;
-  DevialetStyle.BraceWrapping = {true, true, true, true, true, true,
-                                 true, true, true, true, true, false};
-  DevialetStyle.BreakAfterJavaFieldAnnotations = false;
-  DevialetStyle.BreakConstructorInitializersBeforeComma = true;
-  DevialetStyle.BreakStringLiterals = true;
-  DevialetStyle.ColumnLimit = 80;
-  DevialetStyle.CommentPragmas = "^ IWYU pragma:";
-  DevialetStyle.ConstructorInitializerAllOnOneLineOrOnePerLine = false;
-  DevialetStyle.ConstructorInitializerIndentWidth = 4;
-  DevialetStyle.ContinuationIndentWidth = 4;
-  DevialetStyle.Cpp11BracedListStyle = false;
-  DevialetStyle.DerivePointerAlignment = false;
-  DevialetStyle.DisableFormat = false;
-  DevialetStyle.ExperimentalAutoDetectBinPacking = false;
-  DevialetStyle.ForEachMacros.push_back("foreach");
-  DevialetStyle.ForEachMacros.push_back("Q_FOREACH");
-  DevialetStyle.ForEachMacros.push_back("BOOST_FOREACH");
-  DevialetStyle.IncludeCategories = {{"^\"(llvm|llvm-c|clang|clang-c)/", 2},
-                                     {"^(<|\"(gtest|isl|json)/)", 3},
-                                     {".*", 1}};
-  DevialetStyle.IncludeIsMainRegex = "$";
-  DevialetStyle.IndentCaseLabels = false;
-  DevialetStyle.IndentWidth = 4;
-  DevialetStyle.IndentWrappedFunctionNames = false;
-  DevialetStyle.JavaScriptQuotes = FormatStyle::JSQS_Leave;
-  DevialetStyle.JavaScriptWrapImports = true;
-  DevialetStyle.KeepEmptyLinesAtTheStartOfBlocks = false;
-  DevialetStyle.MacroBlockBegin = "";
-  DevialetStyle.MacroBlockEnd = "";
-  DevialetStyle.MaxEmptyLinesToKeep = 1;
-  DevialetStyle.NamespaceIndentation = FormatStyle::NI_None;
-  DevialetStyle.ObjCBlockIndentWidth = 2;
-  DevialetStyle.ObjCSpaceAfterProperty = false;
-  DevialetStyle.ObjCSpaceBeforeProtocolList = true;
-  DevialetStyle.PointerAlignment = FormatStyle::PAS_Left;
-  DevialetStyle.SpaceAfterCStyleCast = true;
-  DevialetStyle.SpaceAfterTemplateKeyword = false;
-  DevialetStyle.SpaceBeforeParens = FormatStyle::SBPO_Never;
-  DevialetStyle.SpaceBeforeAssignmentOperators = true;
-  DevialetStyle.SpaceInEmptyParentheses = false;
-  DevialetStyle.SpacesBeforeTrailingComments = 1;
-  DevialetStyle.SpacesInAngles = true;
-  DevialetStyle.SpacesInContainerLiterals = true;
-  DevialetStyle.SpacesInCStyleCastParentheses = true;
-  DevialetStyle.SpacesInParentheses = true;
-  DevialetStyle.SpacesInSquareBrackets = true;
-  DevialetStyle.Standard = FormatStyle::LS_Cpp11;
-  DevialetStyle.ReflowComments = false;
-  DevialetStyle.SortIncludes = true;
-  DevialetStyle.TabWidth = 4;
-  DevialetStyle.UseTab = FormatStyle::UT_Never;
-  DevialetStyle.PenaltyBreakBeforeFirstCallParameter = 19;
-  DevialetStyle.PenaltyBreakComment = 300;
-  DevialetStyle.PenaltyBreakFirstLessLess = 120;
-  DevialetStyle.PenaltyBreakString = 1000;
-  DevialetStyle.PenaltyExcessCharacter = 1000000;
-  DevialetStyle.PenaltyReturnTypeOnItsOwnLine = 60;
-
-  return DevialetStyle;
-}
-
 bool getPredefinedStyle(StringRef Name, FormatStyle::LanguageKind Language,
                         FormatStyle *Style) {
   if (Name.equals_lower("llvm")) {
@@ -842,8 +739,6 @@ bool getPredefinedStyle(StringRef Name, FormatStyle::LanguageKind Language,
     *Style = getGNUStyle();
   } else if (Name.equals_lower("none")) {
     *Style = getNoStyle();
-  } else if (Name.equals_lower("Devialet")) {
-    *Style = getDevialetStyle();
   } else {
     return false;
   }

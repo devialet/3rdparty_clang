@@ -240,8 +240,6 @@ struct FormatStyle {
     BS_GNU,
     /// Like ``Attach``, but break before functions.
     BS_WebKit,
-    /// Like no one !
-    BS_Devialet,
     /// Configure each individual brace in `BraceWrapping`.
     BS_Custom
   };
@@ -259,8 +257,6 @@ struct FormatStyle {
     bool AfterEnum;
     /// \brief Wrap function definitions.
     bool AfterFunction;
-    /// \brief Wrap lambda definition.
-    bool AfterLambda;
     /// \brief Wrap namespace definitions.
     bool AfterNamespace;
     /// \brief Wrap ObjC definitions (``@autoreleasepool``, interfaces, ..).

@@ -839,6 +839,18 @@ UnwrappedLineFormatter::format(const SmallVectorImpl<AnnotatedLine *> &Lines,
     if (ShouldFormat && TheLine.Type == LT_Invalid && IncompleteFormat)
       *IncompleteFormat = true;
 
+    // DVLT SPECIFIC: do not parse log code
+    if (TheLine.First && TheLine.First->is(tok::identifier) &&
+        (TheLine.First->TokenText == "tDebug" ||
+         TheLine.First->TokenText == "tCritical" ||
+         TheLine.First->TokenText == "tFatal" ||
+         TheLine.First->TokenText == "tInfo" ||
+         TheLine.First->TokenText == "tTrace" ||
+         TheLine.First->TokenText == "tWarning") &&
+         TheLine.Last && TheLine.Last->is(tok::semi))
+      ShouldFormat = false;
+    // DVLT SPECIFIC
+
     if (ShouldFormat && TheLine.Type != LT_Invalid) {
       if (!DryRun)
         formatFirstToken(*TheLine.First, PreviousLine, TheLine.Level, Indent,

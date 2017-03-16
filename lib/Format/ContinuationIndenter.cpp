@@ -61,6 +61,31 @@ static bool startsNextParameter(const FormatToken &Current,
           !Style.BreakConstructorInitializersBeforeComma);
 }
 
+static bool IsStdFunctionReturnType( FormatToken* token )
+{
+  //Return type must starts with an identifier
+  if (token->isNot(tok::identifier))
+    return false;
+
+  //Skip identifier::...::identifier sequence
+  while (token->isOneOf(tok::identifier, tok::coloncolon) && token->Previous)
+    token = token->Previous;
+
+  //We must have hit '<'
+  if (token->isNot(tok::less))
+    return false;
+
+  if (!token->Previous)
+    return false;
+
+  token = token->Previous;
+
+  if (token->is(tok::identifier) && token->TokenText == "function")
+    return true;
+
+  return false;
+}
+
 ContinuationIndenter::ContinuationIndenter(const FormatStyle &Style,
                                            const AdditionalKeywords &Keywords,
                                            const SourceManager &SourceMgr,
@@ -340,8 +365,15 @@ void ContinuationIndenter::addTokenOnCurrentLine(LineState &State, bool DryRun,
   unsigned Spaces = Current.SpacesRequiredBefore + ExtraSpaces;
 
   if (!DryRun)
-    Whitespaces.replaceWhitespace(Current, /*Newlines=*/0, /*IndentLevel=*/0,
-                                  Spaces, State.Column + Spaces);
+  {
+    // DEVIALET SPECIFIC: keep space between std::function return type and
+    // opening parenthesis
+    if (Current.is(tok::l_paren) && Current.Previous &&
+        !IsStdFunctionReturnType(Current.Previous))
+        Whitespaces.replaceWhitespace(Current, /*Newlines=*/0,
+                                      /*IndentLevel=*/0, Spaces,
+                                      State.Column + Spaces);
+  }
 
   if (Current.is(TT_SelectorName) &&
       !State.Stack.back().ObjCSelectorNameFound) {

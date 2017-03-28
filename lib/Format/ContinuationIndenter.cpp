@@ -64,24 +64,24 @@ static bool startsNextParameter(const FormatToken &Current,
 static bool IsStdFunctionReturnType( FormatToken* token )
 {
   //Return type must starts with an identifier
-  if (token->isNot(tok::identifier))
-    return false;
+  if (token->is(tok::identifier) || token->isSimpleTypeSpecifier()) {
+    //Skip identifier::...::identifier sequence
+    while ((token->isOneOf(tok::identifier, tok::coloncolon) ||
+            token->isSimpleTypeSpecifier()) && token->Previous)
+      token = token->Previous;
 
-  //Skip identifier::...::identifier sequence
-  while (token->isOneOf(tok::identifier, tok::coloncolon) && token->Previous)
+    //We must have hit '<'
+    if (token->isNot(tok::less))
+      return false;
+
+    if (!token->Previous)
+      return false;
+
     token = token->Previous;
 
-  //We must have hit '<'
-  if (token->isNot(tok::less))
-    return false;
-
-  if (!token->Previous)
-    return false;
-
-  token = token->Previous;
-
-  if (token->is(tok::identifier) && token->TokenText == "function")
-    return true;
+    if (token->is(tok::identifier) && token->TokenText == "function")
+      return true;
+  }
 
   return false;
 }

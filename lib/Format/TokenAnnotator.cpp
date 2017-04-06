@@ -13,6 +13,7 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "FormatHelper.h"
 #include "TokenAnnotator.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/Debug.h"
@@ -23,31 +24,6 @@ namespace clang {
 namespace format {
 
 namespace {
-
-static bool IsStdFunctionReturnType( FormatToken* token )
-{
-  //Return type must starts with an identifier
-  if (token->is(tok::identifier) || token->isSimpleTypeSpecifier()) {
-    //Skip identifier::...::identifier sequence
-    while ((token->isOneOf(tok::identifier, tok::coloncolon) ||
-            token->isSimpleTypeSpecifier()) && token->Previous)
-      token = token->Previous;
-
-    //We must have hit '<'
-    if (token->isNot(tok::less))
-      return false;
-
-    if (!token->Previous)
-      return false;
-
-    token = token->Previous;
-
-    if (token->is(tok::identifier) && token->TokenText == "function")
-      return true;
-  }
-
-  return false;
-}
 
 /// \brief A parser that gathers additional information about tokens.
 ///
@@ -1874,7 +1850,8 @@ void TokenAnnotator::calculateFormattingInformation(AnnotatedLine &Line) {
     }
 
     if (Current->SpacesRequiredBefore == 0 && Current->is(tok::l_paren) &&
-        IsStdFunctionReturnType(Current->Previous)) {
+        (IsStdFunctionReturnType(Current->Previous) ||
+         IsQtSignalEmit(Current->Previous)) ) {
       Current->SpacesRequiredBefore = 1;
     }
 
@@ -2155,11 +2132,12 @@ bool TokenAnnotator::spaceRequiredBetween(const AnnotatedLine &Line,
   if (Right.is(tok::ellipsis))
     return Left.Tok.isLiteral() || (Left.is(tok::identifier) && Left.Previous &&
                                     Left.Previous->is(tok::kw_case));
-  if (Left.is(tok::l_square) && Right.is(tok::amp))
+  if (Left.is(tok::l_square) && Right.is(tok::amp)) {
     if (Style.SpacesInSquareBrackets)
       return true;
     else
       return false;
+  }
   if (Right.is(TT_PointerOrReference))
     return (Left.is(tok::r_paren) && Line.MightBeFunctionDecl) ||
            (Left.Tok.isLiteral() || (Left.is(tok::kw_const) && Left.Previous &&

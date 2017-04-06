@@ -6,6 +6,7 @@ add_clang_library(clangFormat
   Comments.cpp
   ContinuationIndenter.cpp
   Format.cpp
+  FormatHelper.cpp
   FormatToken.cpp
   FormatTokenLexer.cpp
   SortJavaScriptImports.cpp

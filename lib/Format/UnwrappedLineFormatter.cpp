@@ -962,6 +962,25 @@ void UnwrappedLineFormatter::formatFirstToken(FormatToken &RootToken,
       PreviousLine->Last->Previous->is(tok::r_brace))
     Newlines++;
 
+  // Always add a new empty line after the last namespace opening brace
+  if (PreviousLine && PreviousLine->Last &&
+      PreviousLine->Last->NamespaceOpeningBrace) {
+    RootToken.MustBreakBefore = true;
+    RootToken.CanBreakBefore = true;
+    RootToken.NewlinesBefore = 1;
+    if (PreviousLine->Last->IsLastNamespaceOpeningBrace)
+      Newlines++;
+  }
+
+  // Always add a new empty line before the first namespace closing brace
+  if (RootToken.NamespaceClosingBrace) {
+    RootToken.MustBreakBefore = true;
+    RootToken.CanBreakBefore = true;
+    RootToken.NewlinesBefore = 1;
+    if (RootToken.IsFirstNamespaceClosingBrace)
+      Newlines++;
+  }
+
   Whitespaces->replaceWhitespace(RootToken, Newlines, IndentLevel, Indent,
                                  Indent, InPPDirective &&
                                              !RootToken.HasUnescapedNewline);

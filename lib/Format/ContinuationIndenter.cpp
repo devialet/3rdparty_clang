@@ -14,6 +14,7 @@
 
 #include "BreakableToken.h"
 #include "ContinuationIndenter.h"
+#include "FormatHelper.h"
 #include "WhitespaceManager.h"
 #include "clang/Basic/OperatorPrecedence.h"
 #include "clang/Basic/SourceManager.h"
@@ -59,31 +60,6 @@ static bool startsNextParameter(const FormatToken &Current,
   return Previous.is(tok::comma) && !Current.isTrailingComment() &&
          (Previous.isNot(TT_CtorInitializerComma) ||
           !Style.BreakConstructorInitializersBeforeComma);
-}
-
-static bool IsStdFunctionReturnType( FormatToken* token )
-{
-  //Return type must starts with an identifier
-  if (token->is(tok::identifier) || token->isSimpleTypeSpecifier()) {
-    //Skip identifier::...::identifier sequence
-    while ((token->isOneOf(tok::identifier, tok::coloncolon) ||
-            token->isSimpleTypeSpecifier()) && token->Previous)
-      token = token->Previous;
-
-    //We must have hit '<'
-    if (token->isNot(tok::less))
-      return false;
-
-    if (!token->Previous)
-      return false;
-
-    token = token->Previous;
-
-    if (token->is(tok::identifier) && token->TokenText == "function")
-      return true;
-  }
-
-  return false;
 }
 
 ContinuationIndenter::ContinuationIndenter(const FormatStyle &Style,
@@ -369,7 +345,8 @@ void ContinuationIndenter::addTokenOnCurrentLine(LineState &State, bool DryRun,
     // DEVIALET SPECIFIC: keep space between std::function return type and
     // opening parenthesis
     if (Current.is(tok::l_paren) && Current.Previous &&
-        !IsStdFunctionReturnType(Current.Previous))
+        !IsStdFunctionReturnType(Current.Previous) &&
+        !IsQtSignalEmit(Current.Previous))
         Whitespaces.replaceWhitespace(Current, /*Newlines=*/0,
                                       /*IndentLevel=*/0, Spaces,
                                       State.Column + Spaces);

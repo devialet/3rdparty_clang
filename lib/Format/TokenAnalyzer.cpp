@@ -101,7 +101,8 @@ tooling::Replacements TokenAnalyzer::process() {
 
   Parser.parse();
 
-  if (NamespaceLBraces.size() == NamespaceRBraces.size()) {
+  if (NamespaceLBraces.size() == NamespaceRBraces.size() &&
+      NamespaceLBraces.size() > 0) {
     for (FormatToken* tok : NamespaceLBraces)
       tok->NamespaceOpeningBrace = true;
     (*NamespaceLBraces.rbegin())->IsLastNamespaceOpeningBrace = true;

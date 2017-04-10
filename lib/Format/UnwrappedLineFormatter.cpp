@@ -841,12 +841,16 @@ UnwrappedLineFormatter::format(const SmallVectorImpl<AnnotatedLine *> &Lines,
 
     // DVLT SPECIFIC: do not parse log code
     if (TheLine.First && TheLine.First->is(tok::identifier) &&
-        (TheLine.First->TokenText == "tDebug" ||
-         TheLine.First->TokenText == "tCritical" ||
+        (TheLine.First->TokenText == "tCritical" ||
+         TheLine.First->TokenText == "tDebug" ||
          TheLine.First->TokenText == "tFatal" ||
          TheLine.First->TokenText == "tInfo" ||
          TheLine.First->TokenText == "tTrace" ||
-         TheLine.First->TokenText == "tWarning") &&
+         TheLine.First->TokenText == "tWarning" ||
+         TheLine.First->TokenText == "qCritical" ||
+         TheLine.First->TokenText == "qDebug" ||
+         TheLine.First->TokenText == "qFatal" ||
+         TheLine.First->TokenText == "qWarning") &&
          TheLine.Last && TheLine.Last->is(tok::semi))
       ShouldFormat = false;
     // DVLT SPECIFIC

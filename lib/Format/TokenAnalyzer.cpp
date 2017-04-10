@@ -93,8 +93,24 @@ tooling::Replacements TokenAnalyzer::process() {
   FormatTokenLexer Tokens(Env.getSourceManager(), Env.getFileID(), Style,
                           Encoding);
 
-  UnwrappedLineParser Parser(Style, Tokens.getKeywords(), Tokens.lex(), *this);
+  std::list<FormatToken*> NamespaceLBraces;
+  std::list<FormatToken*> NamespaceRBraces;
+
+  UnwrappedLineParser Parser(Style, Tokens.getKeywords(), Tokens.lex(), *this,
+    NamespaceLBraces, NamespaceRBraces);
+
   Parser.parse();
+
+  if (NamespaceLBraces.size() == NamespaceRBraces.size()) {
+    for (FormatToken* tok : NamespaceLBraces)
+      tok->NamespaceOpeningBrace = true;
+    (*NamespaceLBraces.rbegin())->IsLastNamespaceOpeningBrace = true;
+
+    for (FormatToken* tok : NamespaceRBraces)
+      tok->NamespaceClosingBrace = true;
+    (*NamespaceRBraces.begin())->IsFirstNamespaceClosingBrace = true;
+  }
+
   assert(UnwrappedLines.rbegin()->empty());
   for (unsigned Run = 0, RunE = UnwrappedLines.size(); Run + 1 != RunE; ++Run) {
     DEBUG(llvm::dbgs() << "Run " << Run << "...\n");

@@ -839,7 +839,7 @@ UnwrappedLineFormatter::format(const SmallVectorImpl<AnnotatedLine *> &Lines,
     if (ShouldFormat && TheLine.Type == LT_Invalid && IncompleteFormat)
       *IncompleteFormat = true;
 
-    // DVLT SPECIFIC: do not parse log code
+    // DVLT SPECIFIC: do not format log code
     if (TheLine.First && TheLine.First->is(tok::identifier) &&
         (TheLine.First->TokenText == "tCritical" ||
          TheLine.First->TokenText == "tDebug" ||
@@ -853,7 +853,14 @@ UnwrappedLineFormatter::format(const SmallVectorImpl<AnnotatedLine *> &Lines,
          TheLine.First->TokenText == "qWarning") &&
          TheLine.Last && TheLine.Last->is(tok::semi))
       ShouldFormat = false;
-    // DVLT SPECIFIC
+
+    // DVLT SPECIFIC: do not format output stream code
+    for (const FormatToken *Tok = TheLine.First; Tok; Tok = Tok->Next) {
+      if (Tok->is(tok::lessless) && Tok->Previous &&
+          Tok->Previous->isNot(tok::kw_operator))
+        ShouldFormat = false;
+    }
+    //
 
     if (ShouldFormat && TheLine.Type != LT_Invalid) {
       if (!DryRun)

@@ -1812,6 +1812,8 @@ void TokenAnnotator::calculateFormattingInformation(AnnotatedLine &Line) {
       Line.First->IsMultiline ? Style.ColumnLimit : Line.First->ColumnWidth;
   if (!Line.First->Next)
     return;
+   if (Line.First->TokenText == "Q_PROPERTY")
+    return;
   FormatToken *Current = Line.First->Next;
   bool InFunctionDecl = Line.MightBeFunctionDecl;
   while (Current) {

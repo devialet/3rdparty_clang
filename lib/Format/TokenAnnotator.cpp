@@ -346,7 +346,8 @@ private:
       if (CurrentToken && CurrentToken->HasUnescapedNewline)
         HasMultipleLines = true;
 
-      if (CurrentToken->Previous && CurrentToken->Previous->is(tok::comma))
+      if (CurrentToken &&
+          CurrentToken->Previous && CurrentToken->Previous->is(tok::comma))
         ParamArgs.push_back(CurrentToken);
     }
     return false;

@@ -342,14 +342,8 @@ void ContinuationIndenter::addTokenOnCurrentLine(LineState &State, bool DryRun,
 
   if (!DryRun)
   {
-    // DEVIALET SPECIFIC: keep space between std::function return type and
-    // opening parenthesis
-    if (Current.is(tok::l_paren) && Current.Previous &&
-        !IsStdFunctionReturnType(Current.Previous) &&
-        !IsQtSignalEmit(Current.Previous))
-        Whitespaces.replaceWhitespace(Current, /*Newlines=*/0,
-                                      /*IndentLevel=*/0, Spaces,
-                                      State.Column + Spaces);
+    Whitespaces.replaceWhitespace(Current, /*Newlines=*/0,
+      /*IndentLevel=*/0, Spaces, State.Column + Spaces);
   }
 
   if (Current.is(TT_SelectorName) &&

@@ -980,7 +980,7 @@ void UnwrappedLineFormatter::formatFirstToken(FormatToken &RootToken,
     RootToken.CanBreakBefore = true;
     RootToken.NewlinesBefore = 1;
     if (PreviousLine->Last->IsLastNamespaceOpeningBrace)
-      Newlines++;
+      Newlines = 2;
   }
 
   // Always add a new empty line before the first namespace closing brace
@@ -989,7 +989,7 @@ void UnwrappedLineFormatter::formatFirstToken(FormatToken &RootToken,
     RootToken.CanBreakBefore = true;
     RootToken.NewlinesBefore = 1;
     if (RootToken.IsFirstNamespaceClosingBrace)
-      Newlines++;
+      Newlines = 2;
   }
 
   Whitespaces->replaceWhitespace(RootToken, Newlines, IndentLevel, Indent,
